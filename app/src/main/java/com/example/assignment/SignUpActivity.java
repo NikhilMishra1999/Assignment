@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +36,7 @@ import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    EditText email,password;
+    EditText email,password,phone;
     TextView link;
     FirebaseAuth mFirebaseAuth;
     FirebaseFirestore fstore;
@@ -62,6 +64,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
+        phone = (EditText) findViewById(R.id.phoneno);
         link = (TextView) findViewById(R.id.link);
         signup = (Button) findViewById(R.id.sign_up);
 
@@ -99,6 +102,26 @@ public class SignUpActivity extends AppCompatActivity {
 
                 final String em = email.getText().toString();
                 final String pass = password.getText().toString();
+                final String number = phone.getText().toString();
+                final String valemail = email.getText().toString().trim();
+                final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+                final String numPattern = "^[+]?[0-9]{10,13}$";
+
+                if (valemail.matches(emailPattern))
+                {
+                } else{
+                    email.setError("Email is Invalid");
+                    email.requestFocus();
+                    return;
+                }
+
+                if (number.matches(numPattern))
+                {
+                } else{
+                    phone.setError("Phone number is Invalid");
+                    phone.requestFocus();
+                    return;
+                }
 
                 if (TextUtils.isEmpty(em)) {
                     email.setError("This field can't be empty");
@@ -112,6 +135,17 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
+                if(TextUtils.isEmpty(number) || number.length()<10){
+                    phone.setError("Valid number is required");
+                    phone.requestFocus();
+                    return;
+                }
+
+                String phonenumber = "+91"+number;
+                Intent intent = new Intent(SignUpActivity.this,VerifyPhone.class);
+                intent.putExtra("phonenumber", phonenumber);
+                startActivity(intent);
+
                 mFirebaseAuth.createUserWithEmailAndPassword(em, pass).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -123,6 +157,7 @@ public class SignUpActivity extends AppCompatActivity {
                             final Map<String, Object> user = new HashMap<>();
                             user.put("email", em);
                             user.put("password", pass);
+                            user.put("phoneno",number);
                             documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -158,7 +193,7 @@ public class SignUpActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"You pressed back button", Toast.LENGTH_SHORT).show();
             }
         }
     }

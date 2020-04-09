@@ -126,6 +126,16 @@ public class LoginActivity extends AppCompatActivity {
 
                 final String em = email.getText().toString();
                 final String pass = password.getText().toString();
+                final String valemail = email.getText().toString().trim();
+                final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
+                if (valemail.matches(emailPattern))
+                {
+                } else{
+                    email.setError("Email is Invalid");
+                    email.requestFocus();
+                    return;
+                }
 
                 if (TextUtils.isEmpty(em)) {
                     email.setError("This field can't be empty");
@@ -173,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You pressed back button", Toast.LENGTH_SHORT).show();
             }
         }
     }
