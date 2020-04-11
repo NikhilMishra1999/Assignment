@@ -15,6 +15,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -41,18 +48,20 @@ public class SignUpActivity extends AppCompatActivity {
     FirebaseAuth mFirebaseAuth;
     FirebaseFirestore fstore;
     String userID;
+    private LoginButton loginbutton;
     Button signup;
     private static final String TAG = "Message";
 
     private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 1;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
         if (user != null) {
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
             startActivity(intent);
         }
     }
@@ -60,6 +69,8 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_sign_up);
 
         email = (EditText) findViewById(R.id.email);
@@ -67,6 +78,37 @@ public class SignUpActivity extends AppCompatActivity {
         phone = (EditText) findViewById(R.id.phoneno);
         link = (TextView) findViewById(R.id.link);
         signup = (Button) findViewById(R.id.sign_up);
+
+        //FACEBOOK AUTH-----------------------------------------------------------------------------
+        //Checking FB Login status
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if(isLoggedIn==true){
+            Intent i = new Intent(getApplicationContext(),FeedActivity.class);
+            startActivity(i);
+        }
+
+        loginbutton = findViewById(R.id.signupfbbutton);
+        callbackManager = CallbackManager.Factory.create();
+        loginbutton.setReadPermissions("email");
+        loginbutton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(getApplicationContext(),error.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        //FACEBOOK AUTH END-------------------------------------------------------------------------
 
         //Firebase--------------------------------------
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -81,7 +123,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         if (mFirebaseAuth.getCurrentUser() != null) {
-            Intent intent = new Intent(this, HomeActivity.class);
+            Intent intent = new Intent(this, FeedActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
@@ -141,11 +183,6 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                String phonenumber = "+91"+number;
-                Intent intent = new Intent(SignUpActivity.this,VerifyPhone.class);
-                intent.putExtra("phonenumber", phonenumber);
-                startActivity(intent);
-
                 mFirebaseAuth.createUserWithEmailAndPassword(em, pass).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -164,7 +201,10 @@ public class SignUpActivity extends AppCompatActivity {
                                     Log.d(TAG, "onSuccess: user profile is created for " + userID);
                                 }
                             });
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            String phonenumber = "+91"+number;
+                            Intent intent = new Intent(SignUpActivity.this,VerifyPhone.class);
+                            intent.putExtra("phonenumber", phonenumber);
+                            startActivity(intent);
                         } else {
                             Toast.makeText(SignUpActivity.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -187,6 +227,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
@@ -205,7 +246,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
                     startActivity(intent);
                 } else {
                     Toast.makeText(SignUpActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();

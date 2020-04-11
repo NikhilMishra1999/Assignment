@@ -3,8 +3,14 @@ package com.example.assignment;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -36,15 +42,17 @@ public class MainActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
-    Button signup;
+    private Button signup;
+    private LoginButton loginbutton;
     TextView loglink;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
             startActivity(intent);
         }
     }
@@ -54,7 +62,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
+
+        //FACEBOOK AUTH-----------------------------------------------------------------------------
+        //Checking FB Login status
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if(isLoggedIn==true){
+            Intent i = new Intent(getApplicationContext(),FeedActivity.class);
+            startActivity(i);
+        }
+
+        loginbutton = findViewById(R.id.fbbutton);
+        callbackManager = CallbackManager.Factory.create();
+        loginbutton.setReadPermissions("email");
+        loginbutton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(getApplicationContext(),error.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        //FACEBOOK AUTH END-------------------------------------------------------------------------
 
         loglink = (TextView) findViewById(R.id.loginlink);
         loglink.setOnClickListener(new View.OnClickListener() {
@@ -96,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
@@ -114,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     FirebaseUser user = mAuth.getCurrentUser();
-                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
                     startActivity(intent);
                 } else {
                     Toast.makeText(MainActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();

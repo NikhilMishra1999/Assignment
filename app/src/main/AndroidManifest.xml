@@ -9,18 +9,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-            <meta-data
-                android:name="com.facebook.sdk.ApplicationId"
-                android:value="@string/facebook_app_id" />
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <activity android:name=".VerifyPhone"
-            android:theme="@style/Theme.Design.Light.NoActionBar"></activity>
+            android:theme="@style/Theme.Design.Light.NoActionBar" />
+        <activity android:name=".FeedActivity"
+            android:theme="@style/Theme.Design.Light.NoActionBar"/>
         <activity
             android:name=".LoginActivity"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
         <activity
             android:name=".SignUpActivity"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
+
         <activity android:name=".HomeActivity" />
         <activity
             android:name=".MainActivity"
