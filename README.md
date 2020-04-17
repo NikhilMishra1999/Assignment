@@ -13,8 +13,14 @@
 
 ## Screenshots
 ![](Screenshots/welcome_activity.jpg)
-
-
+![](Screenshots/signup_activity.jpg)
+![](Screenshots/otp_verify.jpg)
+![](Screenshots/login_activity.jpg)
+![](Screenshots/reset_password.jpg)
+![](Screenshots/tags.jpg)
+![](Screenshots/trending.jpg)
+![](Screenshots/explore.jpg)
+![](Screenshots/saved.jpg)
 
 ## Working
 1. User signs up to the application with Sign-up Verification provided by firebase and gets registered in DB, options for signup are:
