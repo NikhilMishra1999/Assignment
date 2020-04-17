@@ -12,12 +12,8 @@
 ### Follow the Working section to see the functionality of the app.
 
 ## Screenshots
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/Assignment/master/Screenshots/welcome_activity.jpg?raw=true)
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/MobileApp_Kaami/nikhil_work/Screenshots/signup_activity.jpg)
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/MobileApp_Kaami/nikhil_work/Screenshots/login_activity.jpg)
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/MobileApp_Kaami/nikhil_work/Screenshots/otp_check.jpg)
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/MobileApp_Kaami/nikhil_work/Screenshots/email_verify.jpg)
-![alt text](https://raw.githubusercontent.com/NikhilMishra1999/Assignment/master/Screenshots/explore.jpg?token=ANDNGCVR6C44AEJ7B3QGCMK6ULBXM)
+![](Screenshots/welcome_activity.jpg)
+
 
 
 ## Working
